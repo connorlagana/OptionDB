@@ -8,4 +8,5 @@ target 'OptionDB' do
   # Pods for OptionDB
     pod 'Charts'
     pod 'lottie-ios'
+    pod 'SDWebImage', '~> 5.0'
 end

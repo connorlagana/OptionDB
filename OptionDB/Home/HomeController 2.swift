@@ -12,9 +12,9 @@ class HomeController: UICollectionViewController, UICollectionViewDelegateFlowLa
     
     let cellId = "Shrek3OnBluRay"
     
-    let arrayOfStockTickers = ["TSLA", "AAPL", "AMZN", "KO", "MU", "AMD", "ANET", "SFIX", "BABA", "OKTA", "WIFI"]
+    let arrayOfStocks = ["TSLA", "AAPL", "AMZN", "KO", "MU", "AMD", "ANET", "SFIX", "BABA"]
     
-    var arrayOfStocksEverything = [Stock]()
+    var arrayOfCompanyNames = [String]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -22,7 +22,7 @@ class HomeController: UICollectionViewController, UICollectionViewDelegateFlowLa
         
         collectionView.register(HomeHoldingCell.self, forCellWithReuseIdentifier: cellId)
         
-        for item in arrayOfStockTickers {
+        for item in arrayOfStocks {
             let urlString = "https://sandbox.iexapis.com/stable/stock/\(item)/quote?token=Tpk_fbd8739ff2c045c6a907a8dbb050665e"
 //            print(item)
             guard let url = URL(string: urlString) else { return }
@@ -30,19 +30,21 @@ class HomeController: UICollectionViewController, UICollectionViewDelegateFlowLa
             URLSession.shared.dataTask(with: url) { (data, response, err) in
                 
                 guard let data = data else { return }
-                
-                do {
-                    let stock = try JSONDecoder().decode(Stock.self, from: data)
-                    self.arrayOfStocksEverything.append(stock)
-                    DispatchQueue.main.async {
-                        self.collectionView.reloadData()
+                DispatchQueue.main.async {
+                    do {
+                        let stock = try JSONDecoder().decode(Stock.self, from: data)
+                        self.arrayOfCompanyNames.append(stock.companyName)
+                        print(stock.companyName)
+                        //                    print(self.arrayOfCompanyNames)
+                        
+                        //                    print(self.arrayOfStocks)
                     }
-//                    print(self.arrayOfStocksEverything)
+                        
+                    catch let err {
+                        print(err)
+                    }
                 }
-                    
-                catch let err {
-                    print(err)
-                }
+                
                 
                 
                 }.resume()
@@ -53,19 +55,7 @@ class HomeController: UICollectionViewController, UICollectionViewDelegateFlowLa
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellId, for: indexPath) as! HomeHoldingCell
-        cell.tickerLabel.text = arrayOfStocksEverything[indexPath.item].symbol
-//        print(arrayOfStocksEverything[indexPath.item])
-        cell.nameLabel.text = arrayOfStocksEverything[indexPath.item].companyName
-        
-        cell.priceLabel.text = "$\(arrayOfStocksEverything[indexPath.item].latestPrice)"
-        cell.percentageLabel.text = "\(arrayOfStocksEverything[indexPath.item].changePercent*100)%"
-        
-        if arrayOfStocksEverything[indexPath.item].changePercent >= 0 {
-            cell.isPositive = true
-        } else {
-            cell.isPositive = false
-        }
-        
+        cell.tickerLabel.text = arrayOfStocks[indexPath.item]
         return cell
     }
     
@@ -81,7 +71,7 @@ class HomeController: UICollectionViewController, UICollectionViewDelegateFlowLa
     }
     
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return arrayOfStocksEverything.count
+        return arrayOfStocks.count
     }
     
 }

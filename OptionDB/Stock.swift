@@ -12,5 +12,6 @@ struct Stock: Decodable {
     let symbol: String
     let companyName: String
     let latestPrice: Float
-    let change: Float?
+    let change: Float
+    let changePercent: Float
 }

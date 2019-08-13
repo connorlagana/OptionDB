@@ -11,17 +11,18 @@ import Charts
 import Lottie
 
 var ticker = ""
-class StockInfoController: UIViewController {
+class StockInfoController: BaseListController, UICollectionViewDelegateFlowLayout {
     
-    
+    let cellId = "WhereTheHoodAt"
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        setupUI()
+//        setupUI()
+        collectionView.backgroundColor = .white
         getStockData()
-        getNewsArticles()
         
+        collectionView.register(IndyCell.self, forCellWithReuseIdentifier: cellId)
     }
     
     let tickerLabel: UILabel = {
@@ -59,7 +60,7 @@ class StockInfoController: UIViewController {
     let newsLabel: UILabel = {
         let lbl = UILabel()
         lbl.text = "News"
-        lbl.font = UIFont(name: "TamilSangamMN-Bold", size: 50)
+        lbl.font = UIFont(name: "TamilSangamMN-Bold", size: 44)
         lbl.textColor = .black
         lbl.translatesAutoresizingMaskIntoConstraints = false
         
@@ -77,7 +78,7 @@ class StockInfoController: UIViewController {
     }()
     
     func setupUI() {
-        view.backgroundColor = .white
+        collectionView.backgroundColor = .white
         dataEntry = [num, num2]
         let data = PieChartDataSet(entries: dataEntry, label: "Hello")
         pieChart.data = PieChartData(dataSet: data)
@@ -86,6 +87,7 @@ class StockInfoController: UIViewController {
         view.addSubview(tickerLabel)
         view.addSubview(nameLabel)
         view.addSubview(priceLabel)
+        view.addSubview(newsLabel)
 //        view.addSubview(pieChart)
         
         tickerLabel.text = ticker
@@ -98,6 +100,9 @@ class StockInfoController: UIViewController {
         
         priceLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
         priceLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 10).isActive = true
+        
+        newsLabel.topAnchor.constraint(equalTo: priceLabel.bottomAnchor, constant: 8).isActive = true
+        newsLabel.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 8).isActive = true
         
 //        pieChart.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 10).isActive = true
 //        pieChart.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 10).isActive = true
@@ -134,34 +139,28 @@ class StockInfoController: UIViewController {
             }.resume()
     }
     
-    func getNewsArticles() {
-        let urlString = "https://newsapi.org/v2/everything?q=\(ticker)&from=2019-08-13&sortBy=popularity&apiKey=161768bbaa4e4ad68dcd540292df6082"
-        
-        guard let url = URL(string: urlString) else { return }
-        
-        URLSession.shared.dataTask(with: url) { (data, response, err) in
-            
-            guard let data = data else { return }
-            
-            do {
-                let new = try JSONDecoder().decode(News.self, from: data)
-                
-                DispatchQueue.main.async {
-                    print(new.articles[0].title)
-                }
-                
-                
-            }
-                
-            catch let err {
-                print(err)
-            }
-            
-            
-            }.resume()
-    }
+    
     
     func runAnimation() {
         
     }
+    
+    override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellId, for: indexPath) as! IndyCell
+        
+        return cell
+    }
+    
+    override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        print("ween")
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        return CGSize(width: view.frame.width, height: 320)
+    }
+    
+    override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return 1
+    }
+    
 }
